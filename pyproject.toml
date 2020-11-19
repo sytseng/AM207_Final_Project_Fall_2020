@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "harvard-luna-passa"
+version = "0.1.0"
+description = "Final project for AM207 at Harvard"
+authors = [
+    "Sangyoon Park <datumvitae@gmail.com>",
+]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+jupyter = "^1.0.0"
+ipykernel = "^5.3.4"
+numpy = "^1.19.1"
+pandas = "^1.1.1"
+scikit-learn = "^0.23.2"
+matplotlib = "^3.3.1"
+autograd = "^1.3"
+
+[tool.poetry.dev-dependencies]
+pytest = "^5.2"
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
