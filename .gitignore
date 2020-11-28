@@ -8,6 +8,7 @@
 !.gitignore
 !pyproject.toml
 !poetry.lock
+*.venv/
 !*.md
 !*.py
 !*.ipynb
