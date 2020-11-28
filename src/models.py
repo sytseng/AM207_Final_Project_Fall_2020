@@ -2,17 +2,10 @@ from autograd import numpy as np
 from autograd import grad
 from autograd.misc.optimizers import adam
 
-class NLM:
-    """The NLM class is essentially the FeedFoward class from in-class exercises and homeworks,
-       the differences being:
 
-        `.forward` method can return the feature map using the `return_feature_map` flag.
+class NeuralNet:
+    """Implement a feed-forward neural network"""
 
-        `.perform_bayesian` method returns the posterior predictive samples, along with 
-            the joint mean, joint variance, and posterior samples.
-
-        `.get_prior_samples` method returns a model samples based on the priors.
-    """
     def __init__(self, architecture, random=None, weights=None):
         # Sanity check
         assert len(architecture['width']) == architecture['hidden_layers']
@@ -52,6 +45,7 @@ class NLM:
 
         self.objective_trace = np.empty((1, 1))
         self.weight_trace = np.empty((1, self.D))
+
 
     def forward(self, weights, x, return_feature_map = False):
         ''' Forward pass given weights and input '''
@@ -103,6 +97,7 @@ class NLM:
 
         return output
 
+
     def make_objective(self, x_train, y_train, reg_param=None):
         ''' Make objective functions: depending on whether or not you want to apply l2 regularization '''
 
@@ -123,6 +118,7 @@ class NLM:
                 return mean_error
 
             return objective, grad(objective)
+
 
     def fit(self, x_train, y_train, params, reg_param=None):
         ''' Wrapper for MLE through gradient descent '''
@@ -183,6 +179,10 @@ class NLM:
         self.objective_trace = self.objective_trace[1:]
         self.weight_trace = self.weight_trace[1:]
 
+
+class NLM(NeuralNet):
+    """Implement a neural linear model (NLM) for regression"""
+
     def get_posterior_samples(self, x_matrix, y_matrix, x_test_matrix, prior_var, noise_var, samples):
         # Currently assumes 0 prior mean, need to change(?)
         '''Function to generate posterior predictive samples for Bayesian linear regression model'''
@@ -203,6 +203,7 @@ class NLM:
 
         return joint_mean, joint_variance, posterior_predictions, posterior_predictive_samples
 
+
     def perform_bayesian(self, x, y, x_test, prior_var=1, noise_var=0.3, samples=100):
         # compute feature map
         feature_map = self.forward(self.weights, x.reshape(1,-1), return_feature_map=True)
@@ -213,6 +214,7 @@ class NLM:
         feature_map_test = np.hstack((np.ones((feature_map_test.shape[0],1)), feature_map_test))
 
         return self.get_posterior_samples(feature_map, y, feature_map_test, prior_var, noise_var, samples=samples)
+
 
     def get_prior_samples(self, x_test, prior_var=1, noise_var=0.3, num_models=100):
         feature_map_test = self.forward(self.weights, x_test.reshape(1,-1), return_feature_map=True)
