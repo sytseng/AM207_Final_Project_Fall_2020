@@ -47,7 +47,12 @@ class NeuralNet:
         self.weight_trace = np.empty((1, self.D))
 
 
-    def forward(self, weights, x, return_feature_map = False):
+    def forward(self, weights, x, return_features=False):
+        """Forward pass given weights and input data.
+
+        Returns:
+            output (numpy.array): Model predictions of shape (n_mod, n_param, n_obs).
+        """
         ''' Forward pass given weights and input '''
         H = self.params['H']
         D_in = self.params['D_in']
@@ -85,8 +90,9 @@ class NeuralNet:
 
             assert input.shape[1] == H[i+1]
 
-        if return_feature_map:
-            return input[0,:,:].T # Transform into shape (n x p)
+        # Output values from the last hidden layer if desired
+        if return_features:
+            return input # Shape: (n_mod, n_param, n_obs)
 
         # Change
         #output layer
@@ -183,41 +189,111 @@ class NeuralNet:
 class NLM(NeuralNet):
     """Implement a neural linear model (NLM) for regression"""
 
-    def get_posterior_samples(self, x_matrix, y_matrix, x_test_matrix, prior_var, noise_var, samples):
-        # Currently assumes 0 prior mean, need to change(?)
-        '''Function to generate posterior predictive samples for Bayesian linear regression model'''
-        prior_variance = np.diag(prior_var * np.ones(x_matrix.shape[1]))
-        prior_precision = np.linalg.inv(prior_variance)
+    def _get_features(self, x, add_constant=False):
+        """Help function for transforming data into features that can be used in
+        Bayesian linear regression
 
-        joint_precision = prior_precision + x_matrix.T.dot(x_matrix) / noise_var
-        joint_variance = np.linalg.inv(joint_precision)
-        joint_mean = joint_variance.dot(x_matrix.T.dot(y_matrix)) / noise_var
+        Args:
+            x (numpy.array): Observed data of shape (n_param, n_obs)
 
-        #sampling 100 points from the posterior
-        posterior_samples = np.random.multivariate_normal(joint_mean.flatten(), joint_variance, size=samples)
+        Returns:
+            x_features (numpy.array): Transformed data of shape (n_param, n_obs)
+        """
 
-        #take posterior predictive samples
-        posterior_predictions = np.dot(posterior_samples, x_test_matrix.T)
-        posterior_predictive_samples = posterior_predictions[np.newaxis, :, :] + np.random.normal(0, noise_var**0.5, size=(100, posterior_predictions.shape[0], posterior_predictions.shape[1]))
-        posterior_predictive_samples = posterior_predictive_samples.reshape((100 * posterior_predictions.shape[0], posterior_predictions.shape[1]))
+        x_features = self.forward(self.weights, x, return_features=True)
+        x_features = x_features[0,:,:] # Reduces to shape (n_param, n_obs)
+        if add_constant:
+            x_features = np.vstack([np.ones((1, x_features.shape[1])), x_features])
 
-        return joint_mean, joint_variance, posterior_predictions, posterior_predictive_samples
+        return x_features
 
 
-    def perform_bayesian(self, x, y, x_test, prior_var=1, noise_var=0.3, samples=100):
-        # compute feature map
-        feature_map = self.forward(self.weights, x.reshape(1,-1), return_feature_map=True)
-        feature_map_test = self.forward(self.weights, x_test.reshape(1,-1), return_feature_map=True)
+    def get_prior_preds(self, x, w_prior_mean, w_prior_cov, noise_var=0.3, n_models=100):
+        """Sample linear models from the given (normal) prior of weights
+        and make predictions on the given data.
 
-        # add constant term to the feature map (for Bayesian regression)
-        feature_map = np.hstack((np.ones((feature_map.shape[0],1)), feature_map))
-        feature_map_test = np.hstack((np.ones((feature_map_test.shape[0],1)), feature_map_test))
+        Args:
+            x (numpy.array): Data of shape (n_param, n_obs) to make predictions on.
+            w_prior_mean (numpy.array): Means of regression model weights.
+            w_prior_cov (numpy.array): Covariance matrix of regression model weights.
+            noise_var (float): Variance of random noise in model prediction.
+            n_models (int): Number of models to sample.
 
-        return self.get_posterior_samples(feature_map, y, feature_map_test, prior_var, noise_var, samples=samples)
+        Returns:
+            preds (numpy.array): Predictions from sampled models; of shape (n_mod, n_obs).
+        """
+
+        # Handle single value inputs for w_mean and w_cov
+        n_weights = self.params['H'][-1] + 1 # Regression includes a bias term
+        w_prior_mean = np.array(w_prior_mean)
+        w_prior_cov = np.array(w_prior_cov)
+        if w_prior_mean.squeeze().shape == ():
+            w_prior_mean = np.array([w_prior_mean] * n_weights)
+        if w_prior_cov.squeeze().shape == ():
+            w_prior_cov = np.eye(n_weights) * w_prior_cov
+
+        # Transform data
+        x_features = self._get_features(x, add_constant=True)
+
+        # Sample models
+        w_samples = np.random.multivariate_normal(
+            mean=w_prior_mean,
+            cov=w_prior_cov,
+            size=n_models
+        ) # Shape: (n_mod, n_param)
+
+        # Make predictions
+        preds = np.dot(w_samples, x_features) # Shape: (n_mod, n_obs)
+        noise = np.random.normal(loc=0, scale=noise_var**0.5, size=preds.shape)
+        preds = preds + noise
+
+        return preds
 
 
-    def get_prior_samples(self, x_test, prior_var=1, noise_var=0.3, num_models=100):
-        feature_map_test = self.forward(self.weights, x_test.reshape(1,-1), return_feature_map=True)
-        W_random = np.random.normal(loc=0, scale=prior_var**0.5, size=(num_models, self.params['H'][-1])) # CHECK WITH WP ABOUT SCALE THEY USED FOR PAPER
+    def get_posterior_preds(self, x, x_obs, y_obs, w_prior_cov, noise_var=0.3, n_models=100):
+        """Infer the posterior from a normal prior with zero means, sample linear models
+        from the posterior, and make predictions on the given data.
 
-        return feature_map_test.dot(W_random.T) + np.random.normal(loc=0, scale=noise_var**0.5, size=(x_test.shape[0], num_models))
+        Args:
+            x (numpy.array): Data of shape (n_param, n_obs) to make predictions on.
+            x_obs (numpy.array): Observed data of shape (n_param, n_obs).
+            y_obs (numpy.array): Observed data of shape (1, n_obs).
+            w_prior_cov (numpy.array): Covariance matrix of regression model weights.
+            noise_var (float): Variance of random noise in model prediction.
+            n_models (int): Number of models to sample.
+
+        Returns:
+            preds (numpy.array): Predictions from sampled models; of shape (n_mod, n_obs).
+        """
+
+        # Handle single value input for w_prior_cov
+        n_weights = self.params['H'][-1] + 1 # Regression includes a bias term
+        w_prior_cov = np.array(w_prior_cov)
+        if w_prior_cov.squeeze().shape == ():
+            w_prior_cov = np.eye(n_weights) * w_prior_cov
+
+        # Transform data
+        x_features = self._get_features(x, add_constant=True)
+        x_obs_features = self._get_features(x_obs, add_constant=True)
+
+        # Infer the posterior from the observed data and prior
+        w_prior_precision = np.linalg.inv(w_prior_cov)
+        w_post_precision = w_prior_precision + x_obs_features.dot(x_obs_features.T) / noise_var
+        epsilon = 1e-5 # To ensure numerical stability of the matrix inverse operation
+        w_post_cov = np.linalg.inv(w_post_precision + epsilon * np.ones(w_post_precision.shape[0]))
+        w_post_mean = w_post_cov.dot(x_obs_features.dot(y_obs.flatten()) / noise_var) # Simplified because prior means are all zeros
+        self.w_post_mean, self.w_post_cov = (w_post_mean, w_post_cov) # Save for later access
+
+        # Sample models
+        w_samples = np.random.multivariate_normal(
+            mean=w_post_mean,
+            cov=w_post_cov,
+            size=n_models
+        ) # Shape: (n_mod, n_param)
+
+        # Make predictions
+        preds = np.dot(w_samples, x_features) # Shape: (n_mod, n_obs)
+        noise = np.random.normal(loc=0, scale=noise_var**0.5, size=preds.shape)
+        preds = preds + noise
+
+        return preds
