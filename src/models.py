@@ -227,8 +227,8 @@ class NLM(NeuralNet):
 
         # Make predictions
         preds = np.dot(w_samples, x_features) # Shape: (n_mod, n_obs)
-        noise = np.random.normal(loc=0, scale=noise_var**0.5, size=preds.shape)
-        preds = preds + noise
+        # noise = np.random.normal(loc=0, scale=noise_var**0.5, size=preds.shape)
+        # preds = preds + noise
 
         return preds
 
@@ -276,8 +276,8 @@ class NLM(NeuralNet):
 
         # Make predictions
         preds = np.dot(w_samples, x_features) # Shape: (n_mod, n_obs)
-        noise = np.random.normal(loc=0, scale=noise_var**0.5, size=preds.shape)
-        preds = preds + noise
+        # noise = np.random.normal(loc=0, scale=noise_var**0.5, size=preds.shape)
+        # preds = preds + noise
 
         return preds
 
