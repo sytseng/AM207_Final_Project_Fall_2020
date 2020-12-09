@@ -1,6 +1,8 @@
 from autograd import numpy as np
 from autograd import grad
 from autograd.misc.optimizers import adam
+from sklearn.gaussian_process import GaussianProcessRegressor, GaussianProcessClassifier
+from sklearn.gaussian_process.kernels import RBF, WhiteKernel, Matern
 
 
 class NeuralNet:
@@ -397,3 +399,28 @@ class LUNA(NLM):
 
         # Save feature map
         self.theta = self.weights[0][:self.D_theta]
+
+
+class GP:
+    """Implement a gaussian process (GP) for regression"""
+    def __init__(self, amplitude=1., length_scale=1., length_scale_bounds='fixed', noise_var = 1., noise_level_bounds='fixed', random_state=0):
+        # Define kernel for the GP prior
+        self.prior_kernel_rbf = amplitude * RBF(length_scale, length_scale_bounds=length_scale_bounds)
+        self.gp_prior_rbf = GaussianProcessRegressor(kernel=self.prior_kernel_rbf, random_state=random_state)
+        
+        # Define a kernel for the GP prior and a white noise kernel for the likelihood
+        self.kernel = self.prior_kernel_rbf + WhiteKernel(noise_level=noise_var)
+
+        # Instantiate and fit a sklearn GP Regressor model
+        self.gp_regressor = GaussianProcessRegressor(kernel=self.kernel, random_state=random_state, optimizer='fmin_l_bfgs_b')
+
+    def get_prior_samples(self, x_test_matrix, n_samples=10, random_state=0):
+        prior_pred_samples = self.gp_prior_rbf.sample_y(x_test_matrix.reshape((-1, 1)), n_samples, random_state).T
+        return prior_pred_samples
+
+    def fit(self, x_train, y_train):
+        self.gp_regressor.fit(x_train.reshape((-1, 1)), y_train)
+        
+    def predict(self, x_test):
+        y_pred_mean, y_pred_std = self.gp_regressor.predict(x_test.reshape((-1, 1)), return_std=True)
+        return y_pred_mean, y_pred_std 
