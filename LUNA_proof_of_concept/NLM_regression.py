@@ -68,10 +68,12 @@ class NLM:
 
         weights = weights.T
 
+
         # Change
         #input to first hidden layer
         W = weights[:H[0] * D_in].T.reshape((-1, H[0], D_in))
         b = weights[H[0] * D_in:H[0] * D_in + H[0]].T.reshape((-1, H[0], 1))
+
         input = self.h(np.matmul(W, x) + b)
         index = H[0] * D_in + H[0]
 

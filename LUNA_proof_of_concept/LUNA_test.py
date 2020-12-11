@@ -11,10 +11,11 @@ import pdb
 import matplotlib.pyplot as plt
 
 from LUNA_regression import LUNA
+from LUNA_regression2 import LUNA2
 from NLM_regression import NLM
 
 def main():
-    x, y, x_test = generate_data(number_of_points=50, noise_variance=9)
+    x, y, x_test = generate_data(number_of_points=40, noise_variance=9)
     plt.scatter(x, y)
     # plt.show()
 
@@ -26,6 +27,7 @@ def main():
     hidden_layers = len(width)
     input_dim = 1
     output_dim = 1
+
 
     M = 30
 
@@ -65,16 +67,30 @@ def main():
     nn_LUNA = LUNA(architecture_LUNA, random=random)
     print('LUNA Number of parameters =',nn_LUNA.D)
 
-    theta_check = nn_LUNA.weights_full[0][:nn_LUNA.D_theta]
-    w_check = nn_LUNA.weights_full[0][nn_LUNA.D_theta:(nn_LUNA.D_theta + nn_LUNA.D_w)]
-    theta_check2 = np.array([theta_check])
-    w_all_check = np.array([np.append(theta_check, w_check) ] )
-    print(np.shape(theta_check2) )
-    print(np.shape(w_all_check) )
+    print("NLM forward shape: {}".format(nn_NLM.forward(nn_NLM.weights, x.reshape((1, -1))  ).shape) )
+
+    nn_LUNA2 = LUNA2(architecture_LUNA, random=random)
+    print('LUNA2 Number of parameters =',nn_LUNA2.D)
+    print('LUNA2 weights vector =', nn_LUNA2.weights.shape)
+    print("y_shape:{}".format( y.reshape((-1, 1)).shape  ) )
+    print("x_shape:{}".format( x.reshape((-1, 1)).shape  ) )
+
+    weights_full_check = nn_LUNA2.weights
+    theta_check = nn_LUNA2.weights[:nn_LUNA2.D_theta]
+    weights_check = nn_LUNA2.weights[nn_LUNA2.D_theta:]
+
+    forward_check1 = nn_LUNA2.forward_theta(theta_check, x.reshape((-1, 1)))
+    forward_check2 = nn_LUNA2.forward_aux(forward_check1, weights_check)
 
 
-    # nn_NLM.fit(x.reshape((1, -1)), y.reshape((1, -1)), params, reg_param = reg_param)
-    nn_LUNA.fit(x.reshape((1, -1)), y.reshape((1, -1)), params, lambda_in, reg_param = reg_param)
+    forward_check_old2 = nn_LUNA2.forward(weights_full_check.reshape(1, -1), x.reshape(1, -1))
+
+    array1 = np.array([[1, 2], [3, 4], [5, 6]])
+    array2 = np.array([[7, 8], [9, 10], [11, 12]])
+    array3 = np.array([[13, 14], [15, 16], [17, 18]])
+    array4 = np.array([[19, 20], [21, 22], [23, 24]])
+
+    nn_LUNA2.fit(x.reshape((-1, 1)), y.reshape((-1, 1)), params, lambda_in, reg_param = reg_param)
 
 def generate_data(number_of_points=10, noise_variance=9):
     '''Function for generating toy regression data'''
