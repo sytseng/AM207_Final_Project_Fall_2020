@@ -346,38 +346,64 @@ class LUNA(NLM):
 
 
     def _finite_diff_grad(self, W_full, x_train):
-        std_del = 0.1
-#             delta_x = self.random.normal(0, std_del, size=(x_train.shape[1]) )  # use different perturbations for each x's
-        delta_x = self.random.normal(0, std_del) # use one perturbation value for all x's
-        x_for = x_train + delta_x
-        x_return = self.forward(W_full, x_for) -  self.forward(W_full, x_train)
+        dim_in = self.params['dim_in']
+        N = x_train.shape[1]
 
-        return np.divide(x_return, delta_x) # M x dim_out x num of samples
+        std_del = 0.1
+        delta_x = np.random.normal(0, std_del) # use one perturbation value for all x's
+
+        if dim_in == 1:
+            x_for = x_train + delta_x
+            x_return = self.forward(W_full, x_for) - self.forward(W_full, x_train)
+            grad_FD = np.squeeze(np.divide(x_return, delta_x)) # M x N
+
+        else:
+            x_train_rep = np.tile(x_train, reps=(1, dim_in)) # make dim_in copies of x_train along dimension of datapoints
+
+            #### Create "blockwise" perturbation matrix: ####
+            ## The goal is to create dim_in blocks of perturbation,
+            ## each block has the size dim_in x N, the first block has ones in first row (corresponding to first input dim) but zeros elsewhere,
+            ## the second block has ones in second row (corresponding to second input dim) but zeros elsewhere, so on and so on,
+            ## then concatenate all blocks along the datapoint dimension to match the shape of x_train_rep
+            x_perturb = np.tile(np.eye(dim_in), reps=(N,1,1)) # create x_perturb
+            x_perturb = x_perturb.T.reshape((dim_in, N * dim_in)) # using reshaping tricks to construct "blockwise" perturbation matrix
+
+            x_for = x_train_rep + delta_x * x_perturb # add perturbation to the repeated x_train
+            x_return = self.forward(W_full, x_for) - self.forward(W_full, x_train_rep) # take difference after passing into forward
+            x_return = x_return.reshape((-1, dim_in, N)) # reshape into M x dim_in x N
+
+            grad_FD = x_return/delta_x # M x dim_in x N
+
+        return grad_FD
 
 
     def _make_objective(self, x_train, y_train, reg_param=0, lambda_in=0):
         M = self.params['M']
+        N = x_train.shape[1]
 
         def objective(W_full, t):
             # Compute L_fit
-            y_train_rep = np.tile(y_train, (M,1,1)) # repeat y_train with shape = dim_out x n_sample to M x dim_out x n_sample
+            y_train_rep = np.tile(y_train, reps=(M,1,1)) # repeat y_train with shape = dim_out x n_sample to M x dim_out x n_sample
             squared_error = np.linalg.norm(y_train_rep - self.forward(W_full, x_train), axis=1)**2
             L_fit = np.mean(squared_error) + reg_param * np.linalg.norm(W_full)
 
-            # Comput L_diverse (#### Now only works for dim_in = 1 and dim_out = 1 ####)
-            grad_FD = np.squeeze(self._finite_diff_grad(W_full, x_train)) # reshape to M x num of samples
-            grad_angle = np.arctan(grad_FD) # compute the "angle of those gradients"
-            grad_angle_rep = np.tile(grad_angle,(M,1,1)) # repeate the matrix to create M x M x num of samples
-            grad_angle_rep_transpose = np.transpose(grad_angle_rep, axes = [1,0,2]) # transpose the M x M matrix so we can take pairwise differences between auxiliary functions
-            coSimSqMat = np.mean(np.cos(grad_angle_rep - grad_angle_rep_transpose)**2, axis = -1) # take pairwise square cosine similarity between auxiliary functions, average over datapoints
+            # Comput L_diverse (#### Only works for dim_out = 1 ####)
+            if self.params['dim_in'] == 1:
+                grad_FD = self._finite_diff_grad(W_full, x_train) # reshape to M x num of samples
+                grad_angle = np.arctan(grad_FD) # compute the "angle of those gradients"
+                grad_angle_rep = np.tile(grad_angle, reps=(M,1,1)) # repeate the matrix to create M x M x num of samples
+                grad_angle_rep_transpose = np.transpose(grad_angle_rep, axes=(1,0,2)) # transpose the M x M matrix so we can take pairwise differences between auxiliary functions
+                coSimSqMat = np.mean(np.cos(grad_angle_rep - grad_angle_rep_transpose)**2, axis=-1) # take pairwise square cosine similarity between auxiliary functions, average over datapoints
+            else:
+                grad_FD = self._finite_diff_grad(W_full, x_train) # M x dim_in x num of samples
+                norm_grad = grad_FD/(np.linalg.norm(grad_FD, axis=1).reshape((M,1,N))) # normalize along gradient wrt dim_in to unit length (so inner product gives cosine value directly)
+                norm_grad_transpose = np.transpose(norm_grad, axes=(1,0,2)) # transpose first two dimensions of norm_grad (for taking pairwise inner product in next step)
+                coSimSqMat = np.mean(np.einsum('ij...,jk...->ik...', norm_grad, norm_grad_transpose)**2, axis=-1) # take pairwise square cosine similarity between auxiliary functions (broadcasting along datapoint dimension), and then average over datapoints
+                #### See documentation for np.einsum (with broadcasting): https://numpy.org/doc/stable/reference/generated/numpy.einsum.html#numpy.einsum
 
-#             norm_grad = grad_FD/(np.linalg.norm(grad_FD, axis = -1, keepdims=True)) # normalize along gradient of f wrt x to unit length
-#             norm_grad = grad_FD/np.tile(np.linalg.norm(grad_FD, axis = -1),(x_train.shape[1],1)).T
-#             coSimSqMat = np.matmul(norm_grad,norm_grad.T)**2 # matrix of all pairs of cosine similarity square
-
-            coSimSq_uniq_pair = coSimSqMat[np.triu(np.ones((M,M),dtype=bool),k=1)] # taking the upper triagular part
-            L_diverse = np.sum(coSimSq_uniq_pair)
-#             L_diverse = np.sum(coSimSq_uniq_pair[np.random.choice(coSimSq_uniq_pair.shape[0],size = int(coSimSq_uniq_pair.shape[0]/3),replace=False )])
+            coSimSq_uniq_pair = coSimSqMat[np.triu(np.ones((M,M), dtype=bool), k=1)] # taking the upper triagular part
+            L_diverse = np.mean(coSimSq_uniq_pair)
+#             L_diverse = np.sum(coSimSq_uniq_pair[np.random.choice(coSimSq_uniq_pair.shape[0],size = int(0.3*coSimSq_uniq_pair.shape[0]),replace=False)])
 
             return L_fit + lambda_in * L_diverse  # punish when coSimSq is large (close to 1)
 
