@@ -111,7 +111,7 @@ class NeuralNet:
 
         def objective(W, t):
             squared_error = np.linalg.norm(y_train - self.forward(W, x_train), axis=1)**2
-            mean_error = np.mean(squared_error) + reg_param * np.linalg.norm(W) / self.D
+            mean_error = np.mean(squared_error) + reg_param * np.linalg.norm(W) / self.D**0.5
             return mean_error
 
         return objective, grad(objective)
@@ -385,7 +385,7 @@ class LUNA(NLM):
             # Compute L_fit
             y_train_rep = np.tile(y_train, reps=(M,1,1)) # repeat y_train with shape = dim_out x n_sample to M x dim_out x n_sample
             squared_error = np.linalg.norm(y_train_rep - self.forward(W_full, x_train), axis=1)**2
-            L_fit = np.mean(squared_error) + reg_param * np.linalg.norm(W_full) / self.D
+            L_fit = np.mean(squared_error) + reg_param * np.linalg.norm(W_full) / self.D**0.5
 
             # Comput L_diverse (#### Only works for dim_out = 1 ####)
             if self.params['dim_in'] == 1:
