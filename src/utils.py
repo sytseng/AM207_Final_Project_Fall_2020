@@ -1,3 +1,4 @@
+import datetime
 from autograd import numpy as np
 
 def generate_data(number_of_points=10, noise_variance=9, input_dimension=1):
@@ -33,3 +34,49 @@ def generate_data(number_of_points=10, noise_variance=9, input_dimension=1):
     y_train = _y_train + e_train
 
     return x_train, y_train, x_test
+
+
+def format_time(elapsed):
+    """Helper function for formatting elapsed times
+
+    Args:
+        elapsed (float): Elapsed time in seconds
+
+    Returns:
+        (str): Elapsed time in "hh:mm:ss" format
+    """
+    elapsed_rounded = int(round(elapsed))
+    return str(datetime.timedelta(seconds=elapsed_rounded))
+
+
+def neg_log_likelihood(y_pred, y_true, y_noise_var, per_sample = True):
+    '''y_pred: num of models/posterior samples x num of datapoints
+       y_true: 1 x num of datapoints
+       y_noise_var: variance of observation noise
+       per_sample: if True, compute neg_log_lik per datapoint; if False, compute neg_log_lik over all datapsoints'''
+
+    N_models = y_pred.shape[0]
+    N_datapoints = y_pred.shape[1]
+    assert N_datapoints == y_true.shape[1]
+
+    noise_sd = y_noise_var**0.5
+
+    if per_sample:
+        constant = - 0.5 * np.log(2 * np.pi) - np.log(noise_sd)
+        exponential = -0.5 * noise_sd**-1 * np.mean((y_pred - y_true)**2)
+
+    else:
+        constant = N_datapoints * (- 0.5 * np.log(2 * np.pi) - np.log(noise_sd))
+        exponential = -0.5 * noise_sd**-1 * np.sum((y_pred - y_true)**2)/N_models
+
+    return -constant - exponential
+
+
+def epistemic_uncertainty(y_pred, take_avg = True):
+    '''y_pred: num of models/posterior samples x num of datapoints
+       take_avg: if True, return avg epistemic uncertainty; if False, return epistemic uncertainty for each datapoint'''
+
+    if take_avg:
+        return np.std(y_pred, axis=0).mean()
+    else:
+        return np.std(y_pred, axis=0)
