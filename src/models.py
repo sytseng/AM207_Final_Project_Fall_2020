@@ -111,7 +111,7 @@ class NeuralNet:
 
         def objective(W, t):
             squared_error = np.linalg.norm(y_train - self.forward(W, x_train), axis=1)**2
-            mean_error = np.mean(squared_error) + reg_param * np.linalg.norm(W) / self.D
+            mean_error = np.mean(squared_error) + reg_param * np.linalg.norm(W) / self.D**0.5
             return mean_error
 
         return objective, grad(objective)
@@ -385,7 +385,7 @@ class LUNA(NLM):
             # Compute L_fit
             y_train_rep = np.tile(y_train, reps=(M,1,1)) # repeat y_train with shape = dim_out x n_sample to M x dim_out x n_sample
             squared_error = np.linalg.norm(y_train_rep - self.forward(W_full, x_train), axis=1)**2
-            L_fit = np.mean(squared_error) + reg_param * np.linalg.norm(W_full) / self.D
+            L_fit = np.mean(squared_error) + reg_param * np.linalg.norm(W_full) / self.D**0.5
 
             # Comput L_diverse (#### Only works for dim_out = 1 ####)
             if self.params['dim_in'] == 1:
@@ -427,7 +427,98 @@ class LUNA(NLM):
         self.theta = self.weights[0][:self.D_theta]
 
 
+class BayesianNN(NeuralNet):
+    
+    """Implement a feed-forward Bayesian neural network with HMC sampler.
+    Inherited from NeuralNet class so we can perform optimization to obtain MLE/MAP solution for weights,
+    and use them as initial position for HMS sampling"""
+    
+    def sample_HMC(self, x_train, y_train, prior_sd = 5., noise_sd = 3., HMC_param = None):
+        self.prior_sd = prior_sd
+        self.noise_sd = noise_sd
+        
+        if HMC_param is None:
+            self.HMC_param = {'step_size':1e-3, 
+                              'leapfrog_steps':50, 
+                              'total_samples':5000, 
+                              'burn_in':.1, 
+                              'thinning_factor':2}
+            
+        else: self.HMC_param = HMC_param
+            
+        # unpack HMC parameters
+        step_size = self.HMC_param['step_size']
+        leapfrog_steps = self.HMC_param['leapfrog_steps']
+        total_samples = self.HMC_param['total_samples']
+        burn_in = self.HMC_param['burn_in']
+        thinning_factor = self.HMC_param['thinning_factor']
+        
+        # prepare parameters for prior distribution
+        D = self.D
+        N = y_train.shape[1]
+        sigma_y = noise_sd**2
+        Sigma_W = prior_sd**2 * np.eye(D)
+        Sigma_W_inv = prior_sd**(-2) * np.eye(D)
+        log_Sigma_W_det = D * np.log(prior_sd**2) # re-formalize after taking log to maintain numerical stability
+
+        # define log prior 
+        def log_prior(W):
+            constant = -0.5 * (D * np.log(2 * np.pi) + log_Sigma_W_det)
+            exponential = -0.5 * np.diag(np.dot(np.dot(W, Sigma_W_inv), W.T))
+            return constant + exponential
+
+        # define log likelihood
+        def log_likelihood(W):
+            constant = N * (- 0.5 * np.log(2 * np.pi) - np.log(sigma_y))
+            exponential = -0.5 * sigma_y**-1 * np.sum((y_train.reshape((1, 1, N)) - self.forward(W, x_train))**2, axis=2).flatten()
+            return constant + exponential
+
+        # define the log joint density
+        neg_log_density = lambda w: -log_likelihood(w) - log_prior(w)  
+
+        # define potential energy and gradient
+        U = neg_log_density
+        u_grad = grad(U)
+        
+        # define kinetic energy and gradient
+        K = lambda p: 0.5*(np.dot(p,p)) + np.log(np.linalg.norm(np.eye(D)))/2 + D*np.log(2*np.pi)/2
+        k_grad = grad(K)
+
+        # initialization
+        samples = np.zeros((total_samples,D))
+        q_curr = self.weights  # initial position
+        n_acc = 0
+
+        # HMC sampling with leapfrog integrator
+        for i in range(total_samples):
+            if i%100 == 0:
+                print('Iteration {}, accept = {}'.format(i,n_acc/(i+1e-10)))
+            p_curr = np.random.multivariate_normal(mean = np.zeros(D), cov = np.eye(D))
+            p_t, q_t = p_curr, q_curr
+            for _ in range(leapfrog_steps):
+                p_half = p_t - (step_size/2)*u_grad(q_t).reshape((-1,))
+                q_t = q_t + step_size*k_grad(p_half).reshape((1,-1))
+                p_t = p_half - (step_size/2)*u_grad(q_t).reshape((-1,))
+            p_T, q_T = -p_t, q_t
+            alpha = np.min([1,np.exp(U(q_curr) + K(p_curr) - U(q_T) - K(p_T))])
+            if np.random.uniform() <= alpha:
+                q_curr = q_T
+                n_acc += 1
+            samples[i,:] = q_curr.reshape((-1,))
+            
+        # store HMC results
+        self.accept = n_acc/total_samples
+        self.samples = samples
+        self.thinned_trace = samples[int(burn_in*total_samples)::thinning_factor,:]
+        
+    def get_posterior_predictive(self, x_test):
+        y_test = self.forward(self.thinned_trace, x_test)[:,0,:]
+        y_test += np.random.normal(0, self.noise_sd, size=y_test.shape)
+        return y_test
+
+    
 class GP:
+    
     """Implement a gaussian process (GP) for regression"""
     def __init__(self, amplitude=1., length_scale=1., length_scale_bounds='fixed', noise_var = 1., noise_level_bounds='fixed', random_state=0):
         # Define kernel for the GP prior
