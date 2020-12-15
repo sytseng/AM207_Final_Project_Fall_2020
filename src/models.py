@@ -414,8 +414,8 @@ class LUNA(NLM):
         assert y_train.shape[0] == self.params['dim_out']
 
         # Make objective function for training
-        reg_param = params.get('reg_param', 0) # No regularization by default
-        lambda_in = params.get('lambda_in', 0) # No diversity training by default
+        self.params['reg_param'] = reg_param = params.get('reg_param', 0) # No regularization by default
+        self.params['lambda_in'] = lambda_in = params.get('lambda_in', 0) # No diversity training by default
         objective, gradient = self._make_objective(x_train, y_train, reg_param, lambda_in)
 
         # Train model
