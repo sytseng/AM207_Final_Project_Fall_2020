@@ -1,7 +1,7 @@
 import datetime
 from autograd import numpy as np
 
-def generate_data(number_of_points=10, noise_variance=9, input_dimension=1):
+def generate_data(number_of_points=10, noise_variance=9., input_dimension=1, gap_start = -2., gap_end = 2., data_start = -4., data_end = 4., scale = 1.):
     """Generate toy regression data with function
             y = (x_1)^3 + (x_2)^3 + ... + (x_D)^3
     for a given input dimension D
@@ -13,8 +13,7 @@ def generate_data(number_of_points=10, noise_variance=9, input_dimension=1):
     """
 
     # Set "parameters" of toy data
-    f = lambda x: x**3
-    data_start, gap_start, gap_end, data_end = (-4, -2, 2, 4)
+    f = lambda x: (x**3) * scale
 
     # Construct toy X
     _x_train = np.hstack([
@@ -27,13 +26,14 @@ def generate_data(number_of_points=10, noise_variance=9, input_dimension=1):
     ])))
     x_train = np.vstack([_x_train.reshape(1, -1)] * input_dimension)
     x_test = np.vstack([_x_test.reshape(1, -1)] * input_dimension)
+    y_test = f(x_test)
 
     # Generate toy y
     _y_train = np.sum(f(x_train), axis=0, keepdims=True)
     e_train = np.random.normal(0, noise_variance**0.5, size=_y_train.shape)
     y_train = _y_train + e_train
 
-    return x_train, y_train, x_test
+    return x_train, y_train, x_test, y_test
 
 
 def format_time(elapsed):

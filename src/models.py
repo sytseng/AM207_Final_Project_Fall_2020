@@ -111,7 +111,8 @@ class NeuralNet:
 
         def objective(W, t):
             squared_error = np.linalg.norm(y_train - self.forward(W, x_train), axis=1)**2
-            mean_error = np.mean(squared_error) + reg_param * np.linalg.norm(W) / self.D**0.5
+#             mean_error = np.mean(squared_error) + reg_param * np.linalg.norm(W) / W.size**0.5
+            mean_error = np.mean(squared_error) + reg_param * (np.linalg.norm(W)**2) / W.size
             return mean_error
 
         return objective, grad(objective)
@@ -385,7 +386,8 @@ class LUNA(NLM):
             # Compute L_fit
             y_train_rep = np.tile(y_train, reps=(M,1,1)) # repeat y_train with shape = dim_out x n_sample to M x dim_out x n_sample
             squared_error = np.linalg.norm(y_train_rep - self.forward(W_full, x_train), axis=1)**2
-            L_fit = np.mean(squared_error) + reg_param * np.linalg.norm(W_full) / self.D**0.5
+#             L_fit = np.mean(squared_error) + reg_param * np.linalg.norm(W_full) / W_full.size**0.5
+            L_fit = np.mean(squared_error) + reg_param * (np.linalg.norm(W_full)**2) / W_full.size
 
             # Comput L_diverse (#### Only works for dim_out = 1 ####)
             if self.params['dim_in'] == 1:
@@ -511,9 +513,10 @@ class BayesianNN(NeuralNet):
         self.samples = samples
         self.thinned_trace = samples[int(burn_in*total_samples)::thinning_factor,:]
         
-    def get_posterior_predictive(self, x_test):
+    def get_posterior_predictive(self, x_test, add_noise = True):
         y_test = self.forward(self.thinned_trace, x_test)[:,0,:]
-        y_test += np.random.normal(0, self.noise_sd, size=y_test.shape)
+        if add_noise:
+            y_test += np.random.normal(0, self.noise_sd, size=y_test.shape)
         return y_test
 
     
