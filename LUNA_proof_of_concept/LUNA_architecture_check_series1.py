@@ -44,53 +44,6 @@ def save_runtime_to_database(model_id, db, train_time, num_data, num_params):
     db.commit()
     print("saved training runtime for {}".format(model_id))
 
-def retrieve_params_from_database(db, cols, query, model_id):
-    cursor = db.cursor()
-
-    q = cursor.execute(query).fetchall()
-    framelist = dict()
-    for i, col_name in enumerate(cols):
-        framelist[col_name] = [row[i] for row in q]
-    values = []
-    for i, id in enumerate(framelist['id']):
-        if id == model_id:
-            values.append(framelist['value'][i])
-
-    return np.array([values])
-
-def retrieve_train_data_from_database(db, cols, query):
-    cursor = db.cursor()
-
-    q = cursor.execute(query).fetchall()
-    framelist = dict()
-    for i, col_name in enumerate(cols):
-        framelist[col_name] = [row[i] for row in q]
-    x_values = []
-    y_values = []
-    for i, xval in enumerate(framelist['x_val']):
-        x_values.append(xval)
-        y_values.append(framelist['y_val'][i])
-
-    return np.array([x_values]), np.array([y_values])
-
-def retrieve_runtimes_from_database(db, cols, query, model_id):
-    cursor = db.cursor()
-
-    q = cursor.execute(query).fetchall()
-    framelist = dict()
-    for i, col_name in enumerate(cols):
-        framelist[col_name] = [row[i] for row in q]
-    runtimes = []
-    data_num = []
-    param_num = []
-    for i, id in enumerate(framelist['id']):
-        if id == model_id:
-            runtimes.append(framelist['runtime'])
-            data_num.append(framelist['num_data'])
-            param_num.append(framelist['num_params'])
-
-    return runtimes, data_num, param_num
-
 def run_experiments():
     x, y, x_test = generate_data(number_of_points=50, noise_variance=9)
     # plt.scatter(x, y)
@@ -98,9 +51,9 @@ def run_experiments():
 
     data_base = sqlite3.connect('LUNA_trained_results_series1.sqlite')
     cursor = data_base.cursor()
-    cursor.execute("DROP TABLE IF EXISTS model_params")
-    cursor.execute("DROP TABLE IF EXISTS runtime")
-    cursor.execute("DROP TABLE IF EXISTS train_data")
+    # cursor.execute("DROP TABLE IF EXISTS model_params")
+    # cursor.execute("DROP TABLE IF EXISTS runtime")
+    # cursor.execute("DROP TABLE IF EXISTS train_data")
     cursor.execute("PRAGMA foreign_keys=1")
     cursor.execute('''CREATE TABLE model_params (
                 id TEXT,
@@ -165,7 +118,7 @@ def run_experiments():
     nn0_tag = 'exp0Aa'
     t = time.time()
     nn0.fit(x.reshape((1, -1)), y.reshape((1, -1)), params)
-    t2 = time.tim() - t
+    t2 = time.time() - t
     save_params_to_database(nn0_tag, data_base, nn0.weights)
     save_runtime_to_database(nn0_tag, data_base, t2, 2*x.shape[1], nn0.weights.shape[1])
 
@@ -173,7 +126,9 @@ def run_experiments():
     architecture['width'] = [50]
     nn1 = LUNA(architecture, random=random)
     nn1_tag = 'exp1Aa'
+    t = time.time()
     nn1.fit(x.reshape((1, -1)), y.reshape((1, -1)), params)
+    t2 = time.time() - t
     save_params_to_database(nn1_tag, data_base, nn1.weights)
     save_runtime_to_database(nn1_tag, data_base, t2, 2*x.shape[1], nn1.weights.shape[1])
 
@@ -181,7 +136,9 @@ def run_experiments():
     architecture['width'] = [25]
     nn2 = LUNA(architecture, random=random)
     nn2_tag = 'exp1Ab'
+    t = time.time()
     nn2.fit(x.reshape((1, -1)), y.reshape((1, -1)), params)
+    t2 = time.time() - t
     save_params_to_database(nn2_tag, data_base, nn2.weights)
     save_runtime_to_database(nn2_tag, data_base, t2, 2*x.shape[1], nn2.weights.shape[1])
 
@@ -189,7 +146,9 @@ def run_experiments():
     architecture['width'] = [100]
     nn3 = LUNA(architecture, random=random)
     nn3_tag = 'exp1Ac'
+    t = time.time()
     nn3.fit(x.reshape((1, -1)), y.reshape((1, -1)), params)
+    t2 = time.time() - t
     save_params_to_database(nn3_tag, data_base, nn3.weights)
     save_runtime_to_database(nn3_tag, data_base, t2, 2*x.shape[1], nn3.weights.shape[1])
 
@@ -197,7 +156,9 @@ def run_experiments():
     architecture['width'] = [25, 25, 25]
     nn4 = LUNA(architecture, random=random)
     nn4_tag = 'exp1Bb'
+    t = time.time()
     nn4.fit(x.reshape((1, -1)), y.reshape((1, -1)), params)
+    t2 = time.time() - t
     save_params_to_database(nn4_tag, data_base, nn4.weights)
     save_runtime_to_database(nn4_tag, data_base, t2, 2*x.shape[1], nn4.weights.shape[1])
 
@@ -205,7 +166,9 @@ def run_experiments():
     architecture['width'] = [25, 25, 25, 25]
     nn5 = LUNA(architecture, random=random)
     nn5_tag = 'exp1Cb'
+    t = time.time()
     nn5.fit(x.reshape((1, -1)), y.reshape((1, -1)), params)
+    t2 = time.time() - t
     save_params_to_database(nn5_tag, data_base, nn5.weights)
     save_runtime_to_database(nn5_tag, data_base, t2, 2*x.shape[1], nn5.weights.shape[1])
 
@@ -213,7 +176,9 @@ def run_experiments():
     architecture['width'] = [100, 50]
     nn6 = LUNA(architecture, random=random)
     nn6_tag = 'exp2Ab'
+    t = time.time()
     nn6.fit(x.reshape((1, -1)), y.reshape((1, -1)), params)
+    t2 = time.time() - t
     save_params_to_database(nn6_tag, data_base, nn6.weights)
     save_runtime_to_database(nn6_tag, data_base, t2, 2*x.shape[1], nn6.weights.shape[1])
 
@@ -221,6 +186,8 @@ def run_experiments():
     architecture['width'] = [50, 25]
     nn7 = LUNA(architecture, random=random)
     nn7_tag = 'exp2Ba'
+    t = time.time()
     nn7.fit(x.reshape((1, -1)), y.reshape((1, -1)), params)
+    t2 = time.time() - t
     save_params_to_database(nn7_tag, data_base, nn7.weights)
     save_runtime_to_database(nn7_tag, data_base, t2, 2*x.shape[1], nn7.weights.shape[1])
