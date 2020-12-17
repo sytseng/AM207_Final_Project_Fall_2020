@@ -8,41 +8,7 @@ from IPython.display import display
 
 from src.models import LUNA
 from src.utils import generate_data
-
-def save_params_to_database(model_id, db, params):
-    cursor = db.cursor()
-
-    for i, val in enumerate(params[0]):
-        cursor.execute('''INSERT INTO model_params
-                    (id, ind, value)
-                    VALUES (?, ?, ?)''',
-                    (model_id, i, val.item()))
-
-    db.commit()
-    print("saved trained parameters for {}".format(model_id))
-
-def save_training_data_to_database(db, x_train, y_train):
-    cursor = db.cursor()
-
-    for i, val in enumerate(x_train[0]):
-        cursor.execute('''INSERT INTO train_data
-                    (ind, x_val, y_val)
-                    VALUES (?, ?, ?)''',
-                    (i, val.item(), y_train[0][i].item() ) )
-
-    db.commit()
-    print("saved training data")
-
-
-def save_runtime_to_database(model_id, db, train_time, num_data, num_params):
-    cursor = db.cursor()
-    cursor.execute('''INSERT INTO runtime
-                (id, runtime, num_data, num_params)
-                VALUES (?, ?, ?, ?)''',
-                (model_id, train_time, num_data, num_params))
-
-    db.commit()
-    print("saved training runtime for {}".format(model_id))
+import LUNA_database_parse as par
 
 def run_experiments():
     x, y, x_test = generate_data(number_of_points=50, noise_variance=9)
@@ -104,7 +70,7 @@ def run_experiments():
         'lambda_in':100.,
     }
 
-    save_training_data_to_database(data_base, x, y)
+    par.save_training_data_to_database(data_base, x, y)
 
     model_train_cols = [col[1] for col in cursor.execute("PRAGMA table_info(train_data)")]
     query1 = '''SELECT * FROM train_data'''
@@ -119,8 +85,8 @@ def run_experiments():
     t = time.time()
     nn0.fit(x.reshape((1, -1)), y.reshape((1, -1)), params)
     t2 = time.time() - t
-    save_params_to_database(nn0_tag, data_base, nn0.weights)
-    save_runtime_to_database(nn0_tag, data_base, t2, 2*x.shape[1], nn0.weights.shape[1])
+    par.save_params_to_database(nn0_tag, data_base, nn0.weights)
+    par.save_runtime_to_database(nn0_tag, data_base, t2, 2*x.shape[1], nn0.weights.shape[1])
 
     ## generate experiment 1 model, 'exp1Aa'
     architecture['width'] = [50]
@@ -129,8 +95,8 @@ def run_experiments():
     t = time.time()
     nn1.fit(x.reshape((1, -1)), y.reshape((1, -1)), params)
     t2 = time.time() - t
-    save_params_to_database(nn1_tag, data_base, nn1.weights)
-    save_runtime_to_database(nn1_tag, data_base, t2, 2*x.shape[1], nn1.weights.shape[1])
+    par.save_params_to_database(nn1_tag, data_base, nn1.weights)
+    par.save_runtime_to_database(nn1_tag, data_base, t2, 2*x.shape[1], nn1.weights.shape[1])
 
     ## generate experiment 2 model, 'exp1Ab'
     architecture['width'] = [25]
@@ -139,8 +105,8 @@ def run_experiments():
     t = time.time()
     nn2.fit(x.reshape((1, -1)), y.reshape((1, -1)), params)
     t2 = time.time() - t
-    save_params_to_database(nn2_tag, data_base, nn2.weights)
-    save_runtime_to_database(nn2_tag, data_base, t2, 2*x.shape[1], nn2.weights.shape[1])
+    par.save_params_to_database(nn2_tag, data_base, nn2.weights)
+    par.save_runtime_to_database(nn2_tag, data_base, t2, 2*x.shape[1], nn2.weights.shape[1])
 
     ## generate experiment 3 model, 'exp1Ac'
     architecture['width'] = [100]
@@ -149,8 +115,8 @@ def run_experiments():
     t = time.time()
     nn3.fit(x.reshape((1, -1)), y.reshape((1, -1)), params)
     t2 = time.time() - t
-    save_params_to_database(nn3_tag, data_base, nn3.weights)
-    save_runtime_to_database(nn3_tag, data_base, t2, 2*x.shape[1], nn3.weights.shape[1])
+    par.save_params_to_database(nn3_tag, data_base, nn3.weights)
+    par.save_runtime_to_database(nn3_tag, data_base, t2, 2*x.shape[1], nn3.weights.shape[1])
 
     ## generate experiment 4 model, 'exp1Bb'
     architecture['width'] = [25, 25, 25]
@@ -159,8 +125,8 @@ def run_experiments():
     t = time.time()
     nn4.fit(x.reshape((1, -1)), y.reshape((1, -1)), params)
     t2 = time.time() - t
-    save_params_to_database(nn4_tag, data_base, nn4.weights)
-    save_runtime_to_database(nn4_tag, data_base, t2, 2*x.shape[1], nn4.weights.shape[1])
+    par.save_params_to_database(nn4_tag, data_base, nn4.weights)
+    par.save_runtime_to_database(nn4_tag, data_base, t2, 2*x.shape[1], nn4.weights.shape[1])
 
     ## generate experiment 5 model, 'exp1Cb'
     architecture['width'] = [25, 25, 25, 25]
@@ -169,8 +135,8 @@ def run_experiments():
     t = time.time()
     nn5.fit(x.reshape((1, -1)), y.reshape((1, -1)), params)
     t2 = time.time() - t
-    save_params_to_database(nn5_tag, data_base, nn5.weights)
-    save_runtime_to_database(nn5_tag, data_base, t2, 2*x.shape[1], nn5.weights.shape[1])
+    par.save_params_to_database(nn5_tag, data_base, nn5.weights)
+    par.save_runtime_to_database(nn5_tag, data_base, t2, 2*x.shape[1], nn5.weights.shape[1])
 
     ## generate experiment 6 model, 'exp2Ab'
     architecture['width'] = [100, 50]
@@ -179,8 +145,8 @@ def run_experiments():
     t = time.time()
     nn6.fit(x.reshape((1, -1)), y.reshape((1, -1)), params)
     t2 = time.time() - t
-    save_params_to_database(nn6_tag, data_base, nn6.weights)
-    save_runtime_to_database(nn6_tag, data_base, t2, 2*x.shape[1], nn6.weights.shape[1])
+    par.save_params_to_database(nn6_tag, data_base, nn6.weights)
+    par.save_runtime_to_database(nn6_tag, data_base, t2, 2*x.shape[1], nn6.weights.shape[1])
 
     ## generate experiment 7 model, 'exp2Ba'
     architecture['width'] = [50, 25]
@@ -189,5 +155,5 @@ def run_experiments():
     t = time.time()
     nn7.fit(x.reshape((1, -1)), y.reshape((1, -1)), params)
     t2 = time.time() - t
-    save_params_to_database(nn7_tag, data_base, nn7.weights)
-    save_runtime_to_database(nn7_tag, data_base, t2, 2*x.shape[1], nn7.weights.shape[1])
+    par.save_params_to_database(nn7_tag, data_base, nn7.weights)
+    par.save_runtime_to_database(nn7_tag, data_base, t2, 2*x.shape[1], nn7.weights.shape[1])

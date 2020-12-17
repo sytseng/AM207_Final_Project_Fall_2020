@@ -8,6 +8,40 @@ from IPython.display import display
 from src.models import LUNA
 from src.utils import generate_data
 
+def save_params_to_database(model_id, db, params):
+    cursor = db.cursor()
+
+    for i, val in enumerate(params[0]):
+        cursor.execute('''INSERT INTO model_params
+                    (id, ind, value)
+                    VALUES (?, ?, ?)''',
+                    (model_id, i, val.item()))
+
+    db.commit()
+    print("saved trained parameters for {}".format(model_id))
+
+def save_training_data_to_database(db, x_train, y_train):
+    cursor = db.cursor()
+
+    for i, val in enumerate(x_train[0]):
+        cursor.execute('''INSERT INTO train_data
+                    (ind, x_val, y_val)
+                    VALUES (?, ?, ?)''',
+                    (i, val.item(), y_train[0][i].item() ) )
+
+    db.commit()
+    print("saved training data")
+
+def save_runtime_to_database(model_id, db, train_time, num_data, num_params):
+    cursor = db.cursor()
+    cursor.execute('''INSERT INTO runtime
+                (id, runtime, num_data, num_params)
+                VALUES (?, ?, ?, ?)''',
+                (model_id, train_time, num_data, num_params))
+
+    db.commit()
+    print("saved training runtime for {}".format(model_id))
+
 def retrieve_params_from_database(db, cols, query, model_id):
     cursor = db.cursor()
 
