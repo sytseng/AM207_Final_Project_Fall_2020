@@ -1,37 +1,45 @@
 import datetime
 from autograd import numpy as np
 
-def generate_data(number_of_points=10, noise_variance=9., input_dimension=1, gap_start = -2., gap_end = 2., data_start = -4., data_end = 4., scale = 1.):
+def generate_data(data_region=[(-4,-2),(2,4)], number_of_points=[10,10], noise_variance=9., input_dimension=1, scale=1.):
     """Generate toy regression data with function
-            y = (x_1)^3 + (x_2)^3 + ... + (x_D)^3
-    for a given input dimension D
+            y = K * (x_1)^3 + K * (x_2)^3 + ... + K * (x_D)^3
+    for a given scale K and input dimension D.
+
+    Args:
+        data_region (list[tuple]): List of tuples specifying data regions in input space.
+        number_of_points (list(int)): List of data points to put in each data region.
 
     Returns:
-        x_train (numpy.array): Toy training X of shape (n_param, n_obs)
-        y_train (numpy.array): Toy training y of shape (n_param, n_obs)
-        x_test (numpy.array): Toy test X of shape (n_param, n_obs)
+        x_train (numpy.array): Toy training X of shape (n_param, n_obs).
+        y_train (numpy.array): Toy training y of shape (n_param, n_obs); noise added.
+        x_test (numpy.array): Toy test X of shape (n_param, n_obs).
+        y_test (numpy.array): Toy test y of shape (n_param, n_obs); no noise.
     """
+
+    # Ensure correct inputs
+    if not hasattr(number_of_points, '__iter__'): # If a single number
+        number_of_points = [int(number_of_points)] * len(list(data_region))
+    if len(list(data_region)) != len(list(number_of_points)):
+        raise Exception("Input Error: `data_region` and `number_of_points` should be lists of the same length.")
 
     # Set "parameters" of toy data
     f = lambda x: (x**3) * scale
 
     # Construct toy X
-    _x_train = np.hstack([
-        np.linspace(data_start, gap_start, number_of_points),
-        np.linspace(gap_end, data_end, number_of_points)
-    ])
+    _x_train = np.concatenate([np.linspace(xs[0], xs[1], n) for xs, n in zip(data_region, number_of_points)])
     _x_test = np.sort(np.unique(np.concatenate([
         _x_train,
-        np.linspace(data_start-1, data_end+1, number_of_points*10)
+        np.linspace(min(data_region)[0]-1, max(data_region)[1]+1, np.sum(number_of_points)*10)
     ])))
     x_train = np.vstack([_x_train.reshape(1, -1)] * input_dimension)
     x_test = np.vstack([_x_test.reshape(1, -1)] * input_dimension)
-    y_test = f(x_test)
 
     # Generate toy y
     _y_train = np.sum(f(x_train), axis=0, keepdims=True)
-    e_train = np.random.normal(0, noise_variance**0.5, size=_y_train.shape)
-    y_train = _y_train + e_train
+    _e_train = np.random.normal(0, noise_variance**0.5, size=_y_train.shape)
+    y_train = _y_train + _e_train
+    y_test = np.sum(f(x_test), axis=0, keepdims=True) # Add no noise
 
     return x_train, y_train, x_test, y_test
 
