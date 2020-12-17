@@ -96,7 +96,7 @@ def run_experiments():
     # plt.scatter(x, y)
     # plt.show()
 
-    data_base = sqlite3.connect('LUNA_trained_results_linux')
+    data_base = sqlite3.connect('LUNA_trained_results_series1.sqlite')
     cursor = data_base.cursor()
     cursor.execute("DROP TABLE IF EXISTS model_params")
     cursor.execute("DROP TABLE IF EXISTS runtime")

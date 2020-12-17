@@ -8,6 +8,6 @@ from IPython.display import display
 from src.models import LUNA
 from src.utils import generate_data
 
-import LUNA_architecture_check as arch
+import LUNA_architecture_check_series1 as arch1
 
-arch.run_experiments()
+arch1.run_experiments()
