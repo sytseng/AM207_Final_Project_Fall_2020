@@ -90,7 +90,7 @@ def run_experiments():
     par.save_params_to_database(nn28_tag, data_base, nn28.weights)
     par.save_runtime_to_database(nn28_tag, data_base, t2, 2*x.shape[1], nn28.weights.shape[1])
 
-    ## generate experiment 28 model, 'exp6Ba'
+    ## generate experiment 29 model, 'exp6Ba'
     architecture['width'] = [30, 10]
     nn29 = LUNA(architecture, random=random)
     nn29_tag = 'exp6Ba'
@@ -100,7 +100,7 @@ def run_experiments():
     par.save_params_to_database(nn29_tag, data_base, nn29.weights)
     par.save_runtime_to_database(nn29_tag, data_base, t2, 2*x.shape[1], nn29.weights.shape[1])
 
-    ## generate experiment 28 model, 'exp6Bb'
+    ## generate experiment 30 model, 'exp6Bb'
     architecture['width'] = [30, 20]
     nn30 = LUNA(architecture, random=random)
     nn30_tag = 'exp6Bb'
@@ -110,7 +110,7 @@ def run_experiments():
     par.save_params_to_database(nn30_tag, data_base, nn30.weights)
     par.save_runtime_to_database(nn30_tag, data_base, t2, 2*x.shape[1], nn30.weights.shape[1])
 
-    ## generate experiment 28 model, 'exp6Bc'
+    ## generate experiment 31 model, 'exp6Bc'
     architecture['width'] = [30, 30]
     nn31 = LUNA(architecture, random=random)
     nn31_tag = 'exp6Bc'
@@ -120,7 +120,7 @@ def run_experiments():
     par.save_params_to_database(nn31_tag, data_base, nn31.weights)
     par.save_runtime_to_database(nn31_tag, data_base, t2, 2*x.shape[1], nn31.weights.shape[1])
 
-    ## generate experiment 28 model, 'exp6Bd'
+    ## generate experiment 32 model, 'exp6Bd'
     architecture['width'] = [30, 40]
     nn32 = LUNA(architecture, random=random)
     nn32_tag = 'exp6Bd'
@@ -130,7 +130,7 @@ def run_experiments():
     par.save_params_to_database(nn32_tag, data_base, nn32.weights)
     par.save_runtime_to_database(nn32_tag, data_base, t2, 2*x.shape[1], nn32.weights.shape[1])
 
-    ## generate experiment 28 model, 'exp6Be'
+    ## generate experiment 33 model, 'exp6Be'
     architecture['width'] = [30, 50]
     nn33 = LUNA(architecture, random=random)
     nn33_tag = 'exp6Be'
@@ -140,7 +140,7 @@ def run_experiments():
     par.save_params_to_database(nn33_tag, data_base, nn33.weights)
     par.save_runtime_to_database(nn33_tag, data_base, t2, 2*x.shape[1], nn33.weights.shape[1])
 
-    ## generate experiment 28 model, 'exp6Bf'
+    ## generate experiment 34 model, 'exp6Bf'
     architecture['width'] = [30, 100]
     nn34 = LUNA(architecture, random=random)
     nn34_tag = 'exp6Bf'
@@ -150,7 +150,7 @@ def run_experiments():
     par.save_params_to_database(nn34_tag, data_base, nn34.weights)
     par.save_runtime_to_database(nn34_tag, data_base, t2, 2*x.shape[1], nn34.weights.shape[1])
 
-    ## generate experiment 28 model, 'exp6Ca'
+    ## generate experiment 35 model, 'exp6Ca'
     architecture['width'] = [50, 10]
     nn35 = LUNA(architecture, random=random)
     nn35_tag = 'exp6Ca'
@@ -160,7 +160,7 @@ def run_experiments():
     par.save_params_to_database(nn35_tag, data_base, nn35.weights)
     par.save_runtime_to_database(nn35_tag, data_base, t2, 2*x.shape[1], nn35.weights.shape[1])
 
-    ## generate experiment 28 model, 'exp6Cb'
+    ## generate experiment 36 model, 'exp6Cb'
     architecture['width'] = [50, 20]
     nn36 = LUNA(architecture, random=random)
     nn36_tag = 'exp6Cb'
@@ -170,7 +170,7 @@ def run_experiments():
     par.save_params_to_database(nn36_tag, data_base, nn36.weights)
     par.save_runtime_to_database(nn36_tag, data_base, t2, 2*x.shape[1], nn36.weights.shape[1])
 
-    ## generate experiment 28 model, 'exp6Cc'
+    ## generate experiment 37 model, 'exp6Cc'
     architecture['width'] = [50, 30]
     nn37 = LUNA(architecture, random=random)
     nn37_tag = 'exp6Cc'
@@ -180,17 +180,17 @@ def run_experiments():
     par.save_params_to_database(nn37_tag, data_base, nn37.weights)
     par.save_runtime_to_database(nn37_tag, data_base, t2, 2*x.shape[1], nn37.weights.shape[1])
 
-    ## generate experiment 28 model, 'exp6Da'
+    ## generate experiment 38 model, 'exp6Da'
     architecture['width'] = [50, 40]
     nn38 = LUNA(architecture, random=random)
-    nn38_tag = 'exp6Da'
+    nn38_tag = 'exp6Cd'
     t = time.time()
     nn38.fit(x.reshape((1, -1)), y.reshape((1, -1)), params)
     t2 = time.time() - t
     par.save_params_to_database(nn38_tag, data_base, nn38.weights)
     par.save_runtime_to_database(nn38_tag, data_base, t2, 2*x.shape[1], nn38.weights.shape[1])
 
-    ## generate experiment 28 model, 'exp6Da'
+    ## generate experiment 39 model, 'exp6Da'
     architecture['width'] = [20, 10]
     nn39 = LUNA(architecture, random=random)
     nn39_tag = 'exp6Da'
@@ -200,7 +200,7 @@ def run_experiments():
     par.save_params_to_database(nn39_tag, data_base, nn39.weights)
     par.save_runtime_to_database(nn39_tag, data_base, t2, 2*x.shape[1], nn39.weights.shape[1])
 
-    ## generate experiment 28 model, 'exp6Db'
+    ## generate experiment 40 model, 'exp6Db'
     architecture['width'] = [20, 20]
     nn40 = LUNA(architecture, random=random)
     nn40_tag = 'exp6Db'
@@ -210,7 +210,7 @@ def run_experiments():
     par.save_params_to_database(nn40_tag, data_base, nn40.weights)
     par.save_runtime_to_database(nn40_tag, data_base, t2, 2*x.shape[1], nn40.weights.shape[1])
 
-    ## generate experiment 28 model, 'exp6Dc'
+    ## generate experiment 41 model, 'exp6Dc'
     architecture['width'] = [20, 30]
     nn41 = LUNA(architecture, random=random)
     nn41_tag = 'exp6Dc'
@@ -220,7 +220,7 @@ def run_experiments():
     par.save_params_to_database(nn41_tag, data_base, nn41.weights)
     par.save_runtime_to_database(nn41_tag, data_base, t2, 2*x.shape[1], nn41.weights.shape[1])
 
-    ## generate experiment 28 model, 'exp6Dd'
+    ## generate experiment 42 model, 'exp6Dd'
     architecture['width'] = [20, 40]
     nn42 = LUNA(architecture, random=random)
     nn42_tag = 'exp6Dd'
@@ -230,7 +230,7 @@ def run_experiments():
     par.save_params_to_database(nn42_tag, data_base, nn42.weights)
     par.save_runtime_to_database(nn42_tag, data_base, t2, 2*x.shape[1], nn42.weights.shape[1])
 
-    ## generate experiment 28 model, 'exp6De'
+    ## generate experiment 43 model, 'exp6De'
     architecture['width'] = [20, 50]
     nn43 = LUNA(architecture, random=random)
     nn43_tag = 'exp6De'
@@ -240,7 +240,7 @@ def run_experiments():
     par.save_params_to_database(nn43_tag, data_base, nn43.weights)
     par.save_runtime_to_database(nn43_tag, data_base, t2, 2*x.shape[1], nn43.weights.shape[1])
 
-    ## generate experiment 28 model, 'exp6Df'
+    ## generate experiment 44 model, 'exp6Df'
     architecture['width'] = [20, 100]
     nn44 = LUNA(architecture, random=random)
     nn44_tag = 'exp6Df'
