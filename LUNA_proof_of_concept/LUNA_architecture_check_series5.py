@@ -19,7 +19,7 @@ def run_experiments():
     _, _, x_test = generate_data(number_of_points=50, noise_variance=9)
     x, y = par.retrieve_train_data_from_database(data_base_old, model_train_cols, query_old)
 
-    data_base = sqlite3.connect('LUNA_trained_results_series3.sqlite')
+    data_base = sqlite3.connect('LUNA_trained_results_series5.sqlite')
     cursor = data_base.cursor()
     cursor.execute("DROP TABLE IF EXISTS model_params")
     cursor.execute("DROP TABLE IF EXISTS runtime")
@@ -80,82 +80,172 @@ def run_experiments():
     ########################################################################
     ########################################################################
 
-    ## generate experiment 14 model, 'exp3Aa'
-    architecture['width'] = [50, 200]
-    nn14 = LUNA(architecture, random=random)
-    nn14_tag = 'exp3Aa'
+    ## generate experiment 28 model, 'exp6Aa'
+    architecture['width'] = [25, 25]
+    nn28 = LUNA(architecture, random=random)
+    nn28_tag = 'exp6Aa'
     t = time.time()
-    nn14.fit(x.reshape((1, -1)), y.reshape((1, -1)), params)
+    nn28.fit(x.reshape((1, -1)), y.reshape((1, -1)), params)
     t2 = time.time() - t
-    par.save_params_to_database(nn14_tag, data_base, nn14.weights)
-    par.save_runtime_to_database(nn14_tag, data_base, t2, 2*x.shape[1], nn14.weights.shape[1])
+    par.save_params_to_database(nn28_tag, data_base, nn28.weights)
+    par.save_runtime_to_database(nn28_tag, data_base, t2, 2*x.shape[1], nn28.weights.shape[1])
 
-    ## generate experiment 15 model, 'exp3Ba'
-    architecture['width'] = [25, 200]
-    nn15 = LUNA(architecture, random=random)
-    nn15_tag = 'exp3Ba'
+    ## generate experiment 28 model, 'exp6Aa'
+    architecture['width'] = [25, 25]
+    nn29 = LUNA(architecture, random=random)
+    nn29_tag = 'exp6Ba'
     t = time.time()
-    nn15.fit(x.reshape((1, -1)), y.reshape((1, -1)), params)
+    nn29.fit(x.reshape((1, -1)), y.reshape((1, -1)), params)
     t2 = time.time() - t
-    par.save_params_to_database(nn15_tag, data_base, nn15.weights)
-    par.save_runtime_to_database(nn15_tag, data_base, t2, 2*x.shape[1], nn15.weights.shape[1])
+    par.save_params_to_database(nn29_tag, data_base, nn29.weights)
+    par.save_runtime_to_database(nn29_tag, data_base, t2, 2*x.shape[1], nn29.weights.shape[1])
 
-    ## generate experiment 16 model, 'exp3Ab'
-    architecture['width'] = [50, 300]
-    nn16 = LUNA(architecture, random=random)
-    nn16_tag = 'exp3Ab'
+    ## generate experiment 28 model, 'exp6Aa'
+    architecture['width'] = [25, 25]
+    nn30 = LUNA(architecture, random=random)
+    nn30_tag = 'exp6Bb'
     t = time.time()
-    nn16.fit(x.reshape((1, -1)), y.reshape((1, -1)), params)
+    nn30.fit(x.reshape((1, -1)), y.reshape((1, -1)), params)
     t2 = time.time() - t
-    par.save_params_to_database(nn16_tag, data_base, nn16.weights)
-    par.save_runtime_to_database(nn16_tag, data_base, t2, 2*x.shape[1], nn16.weights.shape[1])
+    par.save_params_to_database(nn30_tag, data_base, nn30.weights)
+    par.save_runtime_to_database(nn30_tag, data_base, t2, 2*x.shape[1], nn30.weights.shape[1])
 
-    ## generate experiment 17 model, 'exp3Bb'
-    architecture['width'] = [25, 300]
-    nn17 = LUNA(architecture, random=random)
-    nn17_tag = 'exp3Bb'
+    ## generate experiment 28 model, 'exp6Aa'
+    architecture['width'] = [25, 25]
+    nn31 = LUNA(architecture, random=random)
+    nn31_tag = 'exp6Bc'
     t = time.time()
-    nn17.fit(x.reshape((1, -1)), y.reshape((1, -1)), params)
+    nn31.fit(x.reshape((1, -1)), y.reshape((1, -1)), params)
     t2 = time.time() - t
-    par.save_params_to_database(nn17_tag, data_base, nn17.weights)
-    par.save_runtime_to_database(nn17_tag, data_base, t2, 2*x.shape[1], nn17.weights.shape[1])
+    par.save_params_to_database(nn31_tag, data_base, nn31.weights)
+    par.save_runtime_to_database(nn31_tag, data_base, t2, 2*x.shape[1], nn31.weights.shape[1])
 
-    ## generate experiment 18 model, 'exp4Aa'
-    architecture['width'] = [50, 50, 50, 100]
-    nn18 = LUNA(architecture, random=random)
-    nn18_tag = 'exp4Aa'
+    ## generate experiment 28 model, 'exp6Aa'
+    architecture['width'] = [25, 25]
+    nn32 = LUNA(architecture, random=random)
+    nn32_tag = 'exp6Aa'
     t = time.time()
-    nn18.fit(x.reshape((1, -1)), y.reshape((1, -1)), params)
+    nn32.fit(x.reshape((1, -1)), y.reshape((1, -1)), params)
     t2 = time.time() - t
-    par.save_params_to_database(nn18_tag, data_base, nn18.weights)
-    par.save_runtime_to_database(nn18_tag, data_base, t2, 2*x.shape[1], nn18.weights.shape[1])
+    par.save_params_to_database(nn32_tag, data_base, nn32.weights)
+    par.save_runtime_to_database(nn32_tag, data_base, t2, 2*x.shape[1], nn32.weights.shape[1])
 
-    ## generate experiment 19 model, 'exp4Ab'
-    architecture['width'] = [25, 25, 25, 100]
-    nn19 = LUNA(architecture, random=random)
-    nn19_tag = 'exp4Ab'
+    ## generate experiment 28 model, 'exp6Aa'
+    architecture['width'] = [25, 25]
+    nn33 = LUNA(architecture, random=random)
+    nn33_tag = 'exp6Aa'
     t = time.time()
-    nn19.fit(x.reshape((1, -1)), y.reshape((1, -1)), params)
+    nn33.fit(x.reshape((1, -1)), y.reshape((1, -1)), params)
     t2 = time.time() - t
-    par.save_params_to_database(nn19_tag, data_base, nn19.weights)
-    par.save_runtime_to_database(nn19_tag, data_base, t2, 2*x.shape[1], nn19.weights.shape[1])
+    par.save_params_to_database(nn33_tag, data_base, nn33.weights)
+    par.save_runtime_to_database(nn33_tag, data_base, t2, 2*x.shape[1], nn33.weights.shape[1])
 
-    ## generate experiment 20 model, 'exp4Ba'
-    architecture['width'] = [50, 50, 50, 50, 50]
-    nn20 = LUNA(architecture, random=random)
-    nn20_tag = 'exp4Ba'
+    ## generate experiment 28 model, 'exp6Aa'
+    architecture['width'] = [25, 25]
+    nn34 = LUNA(architecture, random=random)
+    nn34_tag = 'exp6Aa'
     t = time.time()
-    nn20.fit(x.reshape((1, -1)), y.reshape((1, -1)), params)
+    nn34.fit(x.reshape((1, -1)), y.reshape((1, -1)), params)
     t2 = time.time() - t
-    par.save_params_to_database(nn20_tag, data_base, nn20.weights)
-    par.save_runtime_to_database(nn20_tag, data_base, t2, 2*x.shape[1], nn20.weights.shape[1])
+    par.save_params_to_database(nn34_tag, data_base, nn34.weights)
+    par.save_runtime_to_database(nn34_tag, data_base, t2, 2*x.shape[1], nn34.weights.shape[1])
 
-    ## generate experiment 21 model, 'exp4Bb'
-    architecture['width'] = [25, 25, 25, 25, 25]
-    nn21 = LUNA(architecture, random=random)
-    nn21_tag = 'exp4Bb'
+    ## generate experiment 28 model, 'exp6Aa'
+    architecture['width'] = [25, 25]
+    nn35 = LUNA(architecture, random=random)
+    nn35_tag = 'exp6Aa'
     t = time.time()
-    nn21.fit(x.reshape((1, -1)), y.reshape((1, -1)), params)
+    nn35.fit(x.reshape((1, -1)), y.reshape((1, -1)), params)
     t2 = time.time() - t
-    par.save_params_to_database(nn21_tag, data_base, nn21.weights)
-    par.save_runtime_to_database(nn21_tag, data_base, t2, 2*x.shape[1], nn21.weights.shape[1])
+    par.save_params_to_database(nn35_tag, data_base, nn35.weights)
+    par.save_runtime_to_database(nn35_tag, data_base, t2, 2*x.shape[1], nn35.weights.shape[1])
+
+    ## generate experiment 28 model, 'exp6Aa'
+    architecture['width'] = [25, 25]
+    nn36 = LUNA(architecture, random=random)
+    nn36_tag = 'exp6Aa'
+    t = time.time()
+    nn36.fit(x.reshape((1, -1)), y.reshape((1, -1)), params)
+    t2 = time.time() - t
+    par.save_params_to_database(nn36_tag, data_base, nn36.weights)
+    par.save_runtime_to_database(nn36_tag, data_base, t2, 2*x.shape[1], nn36.weights.shape[1])
+
+    ## generate experiment 28 model, 'exp6Aa'
+    architecture['width'] = [25, 25]
+    nn37 = LUNA(architecture, random=random)
+    nn37_tag = 'exp6Aa'
+    t = time.time()
+    nn37.fit(x.reshape((1, -1)), y.reshape((1, -1)), params)
+    t2 = time.time() - t
+    par.save_params_to_database(nn37_tag, data_base, nn37.weights)
+    par.save_runtime_to_database(nn37_tag, data_base, t2, 2*x.shape[1], nn37.weights.shape[1])
+
+    ## generate experiment 28 model, 'exp6Aa'
+    architecture['width'] = [25, 25]
+    nn38 = LUNA(architecture, random=random)
+    nn38_tag = 'exp6Aa'
+    t = time.time()
+    nn38.fit(x.reshape((1, -1)), y.reshape((1, -1)), params)
+    t2 = time.time() - t
+    par.save_params_to_database(nn38_tag, data_base, nn38.weights)
+    par.save_runtime_to_database(nn38_tag, data_base, t2, 2*x.shape[1], nn38.weights.shape[1])
+
+    ## generate experiment 28 model, 'exp6Aa'
+    architecture['width'] = [25, 25]
+    nn39 = LUNA(architecture, random=random)
+    nn39_tag = 'exp6Aa'
+    t = time.time()
+    nn39.fit(x.reshape((1, -1)), y.reshape((1, -1)), params)
+    t2 = time.time() - t
+    par.save_params_to_database(nn39_tag, data_base, nn39.weights)
+    par.save_runtime_to_database(nn39_tag, data_base, t2, 2*x.shape[1], nn39.weights.shape[1])
+
+    ## generate experiment 28 model, 'exp6Aa'
+    architecture['width'] = [25, 25]
+    nn40 = LUNA(architecture, random=random)
+    nn40_tag = 'exp6Aa'
+    t = time.time()
+    nn40.fit(x.reshape((1, -1)), y.reshape((1, -1)), params)
+    t2 = time.time() - t
+    par.save_params_to_database(nn40_tag, data_base, nn40.weights)
+    par.save_runtime_to_database(nn40_tag, data_base, t2, 2*x.shape[1], nn40.weights.shape[1])
+
+    ## generate experiment 28 model, 'exp6Aa'
+    architecture['width'] = [25, 25]
+    nn41 = LUNA(architecture, random=random)
+    nn41_tag = 'exp6Aa'
+    t = time.time()
+    nn41.fit(x.reshape((1, -1)), y.reshape((1, -1)), params)
+    t2 = time.time() - t
+    par.save_params_to_database(nn41_tag, data_base, nn41.weights)
+    par.save_runtime_to_database(nn41_tag, data_base, t2, 2*x.shape[1], nn41.weights.shape[1])
+
+    ## generate experiment 28 model, 'exp6Aa'
+    architecture['width'] = [25, 25]
+    nn42 = LUNA(architecture, random=random)
+    nn42_tag = 'exp6Aa'
+    t = time.time()
+    nn42.fit(x.reshape((1, -1)), y.reshape((1, -1)), params)
+    t2 = time.time() - t
+    par.save_params_to_database(nn42_tag, data_base, nn42.weights)
+    par.save_runtime_to_database(nn42_tag, data_base, t2, 2*x.shape[1], nn42.weights.shape[1])
+
+    ## generate experiment 28 model, 'exp6Aa'
+    architecture['width'] = [25, 25]
+    nn43 = LUNA(architecture, random=random)
+    nn43_tag = 'exp6Aa'
+    t = time.time()
+    nn43.fit(x.reshape((1, -1)), y.reshape((1, -1)), params)
+    t2 = time.time() - t
+    par.save_params_to_database(nn43_tag, data_base, nn43.weights)
+    par.save_runtime_to_database(nn43_tag, data_base, t2, 2*x.shape[1], nn43.weights.shape[1])
+
+    ## generate experiment 28 model, 'exp6Aa'
+    architecture['width'] = [25, 25]
+    nn44 = LUNA(architecture, random=random)
+    nn44_tag = 'exp6Aa'
+    t = time.time()
+    nn44.fit(x.reshape((1, -1)), y.reshape((1, -1)), params)
+    t2 = time.time() - t
+    par.save_params_to_database(nn44_tag, data_base, nn44.weights)
+    par.save_runtime_to_database(nn44_tag, data_base, t2, 2*x.shape[1], nn44.weights.shape[1])
