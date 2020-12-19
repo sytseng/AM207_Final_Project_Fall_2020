@@ -14,6 +14,7 @@ import LUNA_architecture_check_series3 as arch3
 import LUNA_architecture_check_series4 as arch4
 import LUNA_architecture_check_series5 as arch5
 import LUNA_architecture_check_series6 as arch6
+import LUNA_architecture_check_series7 as arch7
 
 
 # arch1.run_experiments()
@@ -21,4 +22,5 @@ import LUNA_architecture_check_series6 as arch6
 # arch3.run_experiments()
 # arch4.run_experiments()
 # arch5.run_experiments()
-arch6.run_experiments()
+# arch6.run_experiments()
+arch7.run_experiments()
