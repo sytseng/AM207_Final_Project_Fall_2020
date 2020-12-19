@@ -1,5 +1,5 @@
 import sqlite3
-import sys; sys.path.insert(0, '..')
+import sys; sys.path.insert(0, '../..')
 from autograd import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
