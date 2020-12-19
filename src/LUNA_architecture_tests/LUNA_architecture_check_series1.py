@@ -11,15 +11,13 @@ from src.utils import generate_data
 import LUNA_database_parse as par
 
 def run_experiments():
-    x, y, x_test = generate_data(number_of_points=50, noise_variance=9)
-    # plt.scatter(x, y)
-    # plt.show()
+    x, y, _ = generate_data(number_of_points=50, noise_variance=9)
 
     data_base = sqlite3.connect('LUNA_trained_results_series1.sqlite')
     cursor = data_base.cursor()
-    # cursor.execute("DROP TABLE IF EXISTS model_params")
-    # cursor.execute("DROP TABLE IF EXISTS runtime")
-    # cursor.execute("DROP TABLE IF EXISTS train_data")
+    cursor.execute("DROP TABLE IF EXISTS model_params")
+    cursor.execute("DROP TABLE IF EXISTS runtime")
+    cursor.execute("DROP TABLE IF EXISTS train_data")
     cursor.execute("PRAGMA foreign_keys=1")
     cursor.execute('''CREATE TABLE model_params (
                 id TEXT,
@@ -71,9 +69,6 @@ def run_experiments():
     }
 
     par.save_training_data_to_database(data_base, x, y)
-
-    model_train_cols = [col[1] for col in cursor.execute("PRAGMA table_info(train_data)")]
-    query1 = '''SELECT * FROM train_data'''
 
     ########################################################################
     ########################################################################

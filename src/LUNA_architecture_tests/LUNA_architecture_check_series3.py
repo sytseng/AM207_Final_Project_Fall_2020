@@ -16,7 +16,6 @@ def run_experiments():
     model_train_cols = [col[1] for col in cursor_old.execute("PRAGMA table_info(train_data)")]
     query_old = '''SELECT * FROM train_data'''
 
-    _, _, x_test = generate_data(number_of_points=50, noise_variance=9)
     x, y = par.retrieve_train_data_from_database(data_base_old, model_train_cols, query_old)
 
     data_base = sqlite3.connect('LUNA_trained_results_series3.sqlite')

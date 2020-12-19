@@ -16,14 +16,13 @@ def run_experiments():
     model_train_cols = [col[1] for col in cursor_old.execute("PRAGMA table_info(train_data)")]
     query_old = '''SELECT * FROM train_data'''
 
-    _, _, x_test = generate_data(number_of_points=50, noise_variance=9)
     x, y = par.retrieve_train_data_from_database(data_base_old, model_train_cols, query_old)
 
     data_base = sqlite3.connect('LUNA_trained_results_series2.sqlite')
     cursor = data_base.cursor()
-    # cursor.execute("DROP TABLE IF EXISTS model_params")
-    # cursor.execute("DROP TABLE IF EXISTS runtime")
-    # cursor.execute("DROP TABLE IF EXISTS train_data")
+    cursor.execute("DROP TABLE IF EXISTS model_params")
+    cursor.execute("DROP TABLE IF EXISTS runtime")
+    cursor.execute("DROP TABLE IF EXISTS train_data")
     cursor.execute("PRAGMA foreign_keys=1")
     cursor.execute('''CREATE TABLE model_params (
                 id TEXT,
@@ -75,9 +74,6 @@ def run_experiments():
     }
 
     par.save_training_data_to_database(data_base, x, y)
-
-    model_train_cols = [col[1] for col in cursor.execute("PRAGMA table_info(train_data)")]
-    query1 = '''SELECT * FROM train_data'''
 
     ########################################################################
     ########################################################################
