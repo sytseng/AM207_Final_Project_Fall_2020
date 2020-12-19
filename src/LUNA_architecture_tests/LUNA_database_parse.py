@@ -83,8 +83,8 @@ def retrieve_runtimes_from_database(db, cols, query, model_id):
     param_num = []
     for i, id in enumerate(framelist['id']):
         if id == model_id:
-            runtimes.append(framelist['runtime'])
-            data_num.append(framelist['num_data'])
-            param_num.append(framelist['num_params'])
+            runtimes.append(framelist['runtime'][i])
+            data_num.append(framelist['num_data'][i])
+            param_num.append(framelist['num_params'][i])
 
     return runtimes, data_num, param_num
