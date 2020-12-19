@@ -11,7 +11,7 @@ from src.utils import generate_data
 import LUNA_database_parse as par
 
 def run_experiments():
-    x, y, _ = generate_data(number_of_points=50, noise_variance=9)
+    x, y, _ , _ = generate_data(number_of_points=50, noise_variance=9)
 
     data_base = sqlite3.connect('LUNA_trained_results_series1.sqlite')
     cursor = data_base.cursor()
