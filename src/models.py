@@ -544,3 +544,7 @@ class GP:
     def predict(self, x_test):
         y_pred_mean, y_pred_std = self.gp_regressor.predict(x_test.reshape((-1, 1)), return_std=True)
         return y_pred_mean, y_pred_std 
+
+    def get_posterior_preds(self, x_test, n_samples = 1):
+        y_samples = self.gp_regressor.sample_y(x_test.reshape((-1, 1)), n_samples = n_samples)
+        return y_samples
