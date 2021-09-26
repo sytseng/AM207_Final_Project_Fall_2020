@@ -1,9 +1,9 @@
 # Project LUNA-PASSA
-This is a clone of the Final Project of AM207 - Stochastic Methods of Data Aanalysis, Inference and Optimization. The original repository can be found [here](https://github.com/weyesians/luna-passa)
+This is a clone of the Final Project of AM207 - Stochastic Methods of Data Aanalysis, Inference and Optimization. The original repository can be found [here](https://github.com/weyesians/luna-passa).
 
 
 ## Overview
-Final project for AM207 at Harvard. LUNA stands for "Learned Uncertainty-Aware"; and PASSA for "Paulina, Avriel, Sangyoon, Shih-Yi, and Arthur". (More contents to be added)
+Final project for AM207 at Harvard. LUNA stands for "Learned Uncertainty-Aware"; and PASSA for "Paulina, Avriel, Sangyoon, Shih-Yi, and Arthur". 
 
 ## Team Members
 
@@ -12,6 +12,9 @@ Final project for AM207 at Harvard. LUNA stands for "Learned Uncertainty-Aware";
 * Sangyoon Park
 * Shih-Yi Tseng
 * Arthur Young
+
+## Description
+The goal of this project is to reproduce a SOTA method in published ICML work, "[Learned Uncertainty-Aware (LUNA) Bases for Bayesian Regression using Multi-Headed Auxiliary Networks](https://arxiv.org/abs/2006.11695)". In this project, we implemented LUNA and reproduced key results in this paper, and extended the scope to invistigate how different factors impact the behavior of LUNA. A complete report can be found in this [notebook](https://github.com/sytseng/AM207_Final_Project_Fall_2020/blob/main/am207_final_project_luna.ipynb).
 
 ## Directory Structure
 ```
