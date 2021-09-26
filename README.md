@@ -1,4 +1,6 @@
 # Project LUNA-PASSA
+This is a clone of the Final Project of AM207 - Stochastic Methods of Data Aanalysis, Inference and Optimization. The original repository can be found [here](https://github.com/weyesians/luna-passa)
+
 
 ## Overview
 Final project for AM207 at Harvard. LUNA stands for "Learned Uncertainty-Aware"; and PASSA for "Paulina, Avriel, Sangyoon, Shih-Yi, and Arthur". (More contents to be added)
